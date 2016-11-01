@@ -1,3 +1,7 @@
+using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Runtime.Serialization;
+
 namespace Task.DB
 {
     using System;
@@ -6,6 +10,7 @@ namespace Task.DB
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
+    [Serializable]
     public partial class Category
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -28,5 +33,16 @@ namespace Task.DB
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Product> Products { get; set; }
+
+        [OnSerializing]
+        public void OnSerializing(StreamingContext context)
+        {
+            var dbContext = context.Context as DbContext;
+            if (dbContext != null)
+            {
+                var objectContext = ((IObjectContextAdapter) dbContext).ObjectContext;
+                objectContext.LoadProperty(this, c => c.Products);
+            }
+        }
     }
 }
