@@ -74,7 +74,14 @@ namespace Task
             _dbContext.Configuration.ProxyCreationEnabled = true;
             _dbContext.Configuration.LazyLoadingEnabled = true;
 
-            var tester = new XmlDataContractSerializerTester<IEnumerable<Order>>(new DataContractSerializer(typeof(IEnumerable<Order>)), true);
+            var serializerSettings = new DataContractSerializerSettings
+            {
+                DataContractSurrogate = new OrdersDataContractSurrogate()
+            };
+
+            var serializer = new DataContractSerializer(typeof(IEnumerable<Order>), serializerSettings);
+
+            var tester = new XmlDataContractSerializerTester<IEnumerable<Order>>(serializer, true);
             var orders = _dbContext.Orders.ToList();
 
             tester.SerializeAndDeserialize(orders);
