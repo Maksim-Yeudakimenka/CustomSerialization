@@ -36,7 +36,8 @@ namespace Task
         {
             _dbContext.Configuration.ProxyCreationEnabled = false;
 
-            var tester = new XmlDataContractSerializerTester<IEnumerable<Product>>(new NetDataContractSerializer(), true);
+            var streamingContext = new StreamingContext(StreamingContextStates.All, _dbContext);
+            var tester = new XmlDataContractSerializerTester<IEnumerable<Product>>(new NetDataContractSerializer(streamingContext), true);
             var products = _dbContext.Products.ToList();
 
             tester.SerializeAndDeserialize(products);
